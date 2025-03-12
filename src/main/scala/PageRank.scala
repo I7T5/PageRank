@@ -1,5 +1,5 @@
 import scala.util.Random
-import scala.collection.parallel.CollectionConverters._
+//import scala.collection.parallel.CollectionConverters._
 
 object PageRank {
     /**
@@ -7,7 +7,9 @@ object PageRank {
      * @return      A map of page.id to a weight of 1.0 for those same WebPage objects
      */
     def equal(pages: Map[String, WebPage]): Map[String, Double] = {
-        Map[String, Double](for (str <- pages.keys) yield str -> 1.0)
+        var tbl = Map[String, Double]()
+        for (str <- pages.keys) do tbl += (str -> 1.0)
+        tbl
     }
 
     /**
