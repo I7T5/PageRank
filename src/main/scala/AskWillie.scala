@@ -16,7 +16,8 @@ import scala.util.Sorting
         val pages: Map[String, WebPage] = mapWebPages(loadWebPages()) // completed for you
 
         // TODO: Measure the importance of each page using one of the functions in PageRank
-        val rankedPages: List[RankedWebPage] = List() // call PageRank.???? here
+        val pageRank = PageRank.equal(pages)
+        val rankedPages: List[RankedWebPage] = (for (str, webpage) <- pages yield RankedWebPage(webpage, pageRank(str))).toList // call PageRank.???? here
 
         // Get user input then perform search until ":quit" is entered
         var query: String = ""
