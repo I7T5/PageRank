@@ -1,5 +1,5 @@
 import scala.math.log
-import scala.collection.parallel.CollectionConverters._
+//import scala.collection.parallel.CollectionConverters._
 
 object PageSearch {
     /**
@@ -8,7 +8,7 @@ object PageSearch {
      * @return       a list of the number of times any of the terms appeared in each page in the same order as given
      */
     def count(pages: List[RankedWebPage], query: List[String]): List[Double] = {
-        List() // TODO: implement this method and remove this stub
+        for page <- pages yield (for s <- query yield page.text.sliding(s.length).count(window => window == s)).length
     }
 
     /**
