@@ -31,12 +31,13 @@ import scala.util.Sorting
             terms != List(":quit")
         } do {
           // TODO: Measure the textual match of each page to these terms using one of the functions in PageSearch
-          val searchedPages: List[SearchedWebPage] = List() // call PageSearch.???? here
+          val pageCount = PageSearch.count(rankedPages,terms)
+          val searchedPages: List[SearchedWebPage] = (for i <- 0 until rankedPages.length yield SearchedWebPage(rankedPages(i), pageCount(i))).toList // call PageSearch.???? here
           // normalize the ranges for weight and textmatch on these pages
           val pageArray = SearchedWebPageNormalize.normalize(searchedPages).toArray
           // sort this array based on the chosen averaging scheme i.e.
           //    (ArithmeticOrdering || GeometricOrdering || HarmonicOrdering)
-          Sorting.quickSort(pageArray)(NameOrdering) // TODO: change this from name ordering to something else!!!
+          Sorting.quickSort(pageArray)(ArithmeticOrdering) // TODO: change this from name ordering to something else!!!
           // Print the top ranked pages in descending order
           for p <- pageArray.reverse.slice(0, 10) do println(f"${p.name}%-15s  ${p.url}")
           // print a divider to make reading the results easier
