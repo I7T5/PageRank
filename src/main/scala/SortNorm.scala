@@ -49,7 +49,7 @@ object GeometricOrdering extends Ordering[SearchedWebPage] {
     // TODO: implement an actual comparison based on Geometric means of weight and textmatch
     def compare(a: SearchedWebPage, b: SearchedWebPage): Int = {
         // sqrt not necessary
-        math.sqrt(math.pow(a.weight, 2) + math.pow(a.textmatch, 2)) compare math.sqrt(math.pow(b.weight, 2) + math.pow(b.textmatch, 2))
+        math.sqrt(a.weight * a.textmatch) compare math.sqrt(b.weight * b.textmatch)
     }
 }
 
