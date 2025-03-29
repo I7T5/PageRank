@@ -16,7 +16,7 @@ import scala.util.Sorting
         val pages: Map[String, WebPage] = mapWebPages(loadWebPages()) // completed for you
 
         // TODO: Measure the importance of each page using one of the functions in PageRank
-        val pageRank = PageRank.equal(pages)
+        val pageRank = PageRank.indegree(pages)
         val rankedPages: List[RankedWebPage] = (for (str, webpage) <- pages yield RankedWebPage(webpage, pageRank(str))).toList // call PageRank.???? here
 
         // Get user input then perform search until ":quit" is entered
@@ -30,8 +30,7 @@ import scala.util.Sorting
             // this is the last line in the expression i.e. the condition of our while loop
             terms != List(":quit")
         } do {
-          // TODO: Measure the textual match of each page to these terms using one of the functions in PageSearch 
-          // if terms.size == 1 && terms.head == "" then continue  // don't do this since continue is hard to import...
+          // TODO: Measure the textual match of each page to these terms using one of the functions in PageSearch
           val pageCount = PageSearch.count(rankedPages,terms)
           val searchedPages: List[SearchedWebPage] = (for i <- 0 until rankedPages.length yield SearchedWebPage(rankedPages(i), pageCount(i))).toList // call PageSearch.???? here
           // normalize the ranges for weight and textmatch on these pages
