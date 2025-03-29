@@ -21,6 +21,33 @@ object PageRank {
     }
 
     def pagerank(pages: Map[String, WebPage]): Map[String, Double] = {
-        Map() // TODO: remove this stub and implement this method
+        val numWalks: Int = 10000
+        val stepsPerWalk: Int = 100
+        var ranking: Map[String, Double] = pages.map((id, _) => id -> 0.0)  // initialize; could do getOrElse too ¯\_(ツ)_/¯
+
+        // computation-saving constants
+        val numPages: Int = pages.size
+        val pageIds: List[String] = pages.keys.toList
+
+        for w <- 0 until numWalks do {  // walk
+            // NOTE: pages.keySet.head doesn't give a random item the same way the following line does...
+            var currPage: String = pageIds(Random.nextInt(numPages))
+
+            for s <- 0 until stepsPerWalk do {  // step
+                val follow: Boolean = Random.nextDouble() < 0.85 && pages(currPage).links.nonEmpty
+                if (follow) {
+                    val links: List[String] = pages(currPage).links
+                    currPage = links(Random.nextInt(links.size))
+                } else {  // randomly jump to a page
+                     currPage = pageIds(Random.nextInt(numPages))
+                }
+
+                // using ranking as storage for R_i aka numStops first
+                ranking += (currPage -> (ranking(currPage) + 1))
+            }
+        }
+
+        // update R_i values to W_i = (R_i + 1)/(S + N)
+        ranking.map((id: String, numStops: Double) => id -> ((numStops+1) / (numWalks+stepsPerWalk)))
     }
 }
