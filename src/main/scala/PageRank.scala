@@ -1,3 +1,4 @@
+import scala.annotation.tailrec
 import scala.util.Random
 //import scala.collection.parallel.CollectionConverters._
 
@@ -23,31 +24,25 @@ object PageRank {
     def pagerank(pages: Map[String, WebPage]): Map[String, Double] = {
         val numWalks: Int = 10000
         val stepsPerWalk: Int = 100
-        var ranking: Map[String, Double] = pages.map((id, _) => id -> 0.0)  // initialize; could do getOrElse too ¯\_(ツ)_/¯
 
         // computation-saving constants
         val numPages: Int = pages.size
         val pageIds: List[String] = pages.keys.toList
 
-        for w <- 0 until numWalks do {  // walk
-            // NOTE: pages.keySet.head doesn't give a random item the same way the following line does...
-            var currPage: String = pageIds(Random.nextInt(numPages))
-
-            for s <- 0 until stepsPerWalk do {  // step
-                val follow: Boolean = Random.nextDouble() < 0.85 && pages(currPage).links.nonEmpty
-                if (follow) {
-                    val links: List[String] = pages(currPage).links
-                    currPage = links(Random.nextInt(links.size))
-                } else {  // randomly jump to a page
-                     currPage = pageIds(Random.nextInt(numPages))
-                }
-
-                // using ranking as storage for R_i aka numStops first
-                ranking += (currPage -> (ranking(currPage) + 1))
-            }
+        // simulating a random walker
+        @tailrec
+        def nextPage(traversedPages: List[String], step: Int): List[String] = {
+            if (step == stepsPerWalk) return traversedPages
+            val currPage: String = traversedPages.head
+            val follow: Boolean = Random.nextDouble() < 0.85 && pages(currPage).links.nonEmpty
+            val links: List[String] = pages(currPage).links
+            val next: String = if follow then links(Random.nextInt(links.size)) else pageIds(Random.nextInt(numPages))
+            nextPage(traversedPages :+ next, step + 1)
         }
 
-        // update R_i values to W_i = (R_i + 1)/(S + N)
-        ranking.map((id: String, numStops: Double) => id -> ((numStops+1) / (numWalks+stepsPerWalk)))
+        // a flattened list of all the walkers' path
+        val stops: Seq[String] = (0 until numWalks).flatMap(_ => nextPage(List(pageIds(Random.nextInt(numPages))), 0))
+
+        pageIds.map((id: String) => id -> (1.0 * (stops.count(_ == id)+1) / (numWalks+stepsPerWalk))).toMap
     }
 }
