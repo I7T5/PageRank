@@ -37,7 +37,7 @@ object PageRank {
             val follow: Boolean = Random.nextDouble() < 0.85 && pages(currPage).links.nonEmpty
             val links: List[String] = pages(currPage).links
             val next: String = if follow then links(Random.nextInt(links.size)) else pageIds(Random.nextInt(numPages))
-            nextPage(traversedPages :+ next, step + 1)
+            nextPage(next +: traversedPages, step + 1)  // prepend nextPage
         }
 
         // a flattened list of all the walkers' path
