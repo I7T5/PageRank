@@ -31,17 +31,16 @@ object PageRank {
 
         // simulating a random walker
         @tailrec
-        def nextPage(traversedPages: List[String], step: Int): List[String] = {
-            if (step == stepsPerWalk) return traversedPages
-            val currPage: String = traversedPages.head
+        def nextPage(currPage: String, step: Int): String = {
+            if (step == stepsPerWalk) return currPage
             val follow: Boolean = Random.nextDouble() < 0.85 && pages(currPage).links.nonEmpty
             val links: List[String] = pages(currPage).links
             val next: String = if follow then links(Random.nextInt(links.size)) else pageIds(Random.nextInt(numPages))
-            nextPage(next +: traversedPages, step + 1)  // prepend nextPage
+            nextPage(next, step + 1) 
         }
 
         // a flattened list of all the walkers' path
-        val stops: Seq[String] = (0 until numWalks).flatMap(_ => nextPage(List(pageIds(Random.nextInt(numPages))), 0))
+        val stops: Seq[String] = (0 until numWalks).map(_ => nextPage(pageIds(Random.nextInt(numPages)), 0))
 
         pageIds.map((id: String) => id -> (1.0 * (stops.count(_ == id)+1) / (numWalks+stepsPerWalk))).toMap
     }
