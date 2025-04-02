@@ -27,6 +27,12 @@ object PageSearch {
      * @return      a list of the TF-IDF score for each page in the same order given
      */
     def tfidf(pages: List[RankedWebPage], query: List[String]): List[Double] = {
-        List() // TODO: implement this method and remove this stub
+        // find inverse freq for query
+        val IDF = (for s <- query yield log(pages.length.toDouble / (pages.count(p => p.text.contains(s)) + 1))).sum
+
+        // find tf for each term
+        val tfScores = tf(pages,query)
+        
+        tfScores.map(_*IDF)
     }
 }
