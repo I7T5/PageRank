@@ -1,6 +1,7 @@
 import scala.annotation.tailrec
 import scala.util.Random
-//import scala.collection.parallel.CollectionConverters._
+import scala.collection.parallel.CollectionConverters.*
+import scala.collection.parallel.ParSeq
 
 object PageRank {
     /**
@@ -18,7 +19,7 @@ object PageRank {
      * @return A map of page.id to a weight that is a simple count of the number of pages linking to that page
      */
     def indegree(pages: Map[String, WebPage]): Map[String, Double] = {
-        pages.map((id: String, _) => id -> pages.values.count(_.links.toSet.contains(id)).toDouble)  // NOTE: links: List[id] not List[urls]
+        pages.par.map((id: String, _) => id -> pages.values.par.count(_.links.toSet.contains(id)).toDouble).toList.toMap  // NOTE: links: List[id] not List[urls]
     }
 
     def pagerank(pages: Map[String, WebPage]): Map[String, Double] = {
@@ -29,7 +30,7 @@ object PageRank {
         val numPages: Int = pages.size
         val pageIds: List[String] = pages.keys.toList
 
-        // simulating a random walker
+        // simulate a random walker
         @tailrec
         def nextPage(currPage: String, step: Int): String = {
             if (step == stepsPerWalk) return currPage
@@ -40,8 +41,8 @@ object PageRank {
         }
 
         // a flattened list of all the walkers' path
-        val stops: Seq[String] = (0 until numWalks).map(_ => nextPage(pageIds(Random.nextInt(numPages)), 0))
+        val stops: ParSeq[String] = (0 until numWalks).par.map(_ => nextPage(pageIds(Random.nextInt(numPages)), 0))
 
-        pageIds.map((id: String) => id -> (1.0 * (stops.count(_ == id)+1) / (numWalks+stepsPerWalk))).toMap
+        pageIds.par.map((id: String) => id -> (1.0 * (stops.count(_ == id)+1) / (numWalks+stepsPerWalk))).toList.toMap
     }
 }
